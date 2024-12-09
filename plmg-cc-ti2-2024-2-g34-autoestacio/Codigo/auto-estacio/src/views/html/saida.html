@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Estacio</title>
+    <link rel="stylesheet" href="../css/saida.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+</head>
+
+<body>
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="CadastrarVeiculo.html"><li class="nav-li">Entrada</li></a>
+                <a href="pagamento.html"><li class="nav-li">Pagamento</li></a>
+                <a href="saida.html"><li class="nav-li">Saída</li></a>
+                <a href="Cadastrar.html"><li class="nav-li">Cadastrar</li></a>
+                <a href="login.html"><li class="nav-li">Login</li></a>
+                <a href="index.html"><li class="nav-li">Inicio</li></a>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <div class="form-section">
+            <div class="form-img"></div>
+            <div class="form-container">
+                <form id="saidaForm">
+                    <div class="form-header margin-bottom">
+                        <h1>Saída do veículo</h1>
+                    </div>
+                    <div class="inputs">
+                        <div class="input-box margin-bottom">
+                            <label for="imagem">Imagem da placa:</label>
+                            <input type="file" id="imagem" name="imagem" accept="image/*">
+                        </div>
+                        <div class="input-box margin-bottom">
+                            <label for="placa">Placa do veículo:</label>
+                            <input type="text" name="placa" id="placa" placeholder="Informe a placa">
+                        </div>
+                        <div class="btn">
+                            <button type="submit">Registrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Função para converter imagem em Base64
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(",")[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Envio do formulário
+        document.getElementById("saidaForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Impede o envio padrão
+
+            let placa = document.getElementById("placa").value;
+            let imagemInput = document.getElementById("imagem").files[0];
+
+            if (imagemInput) {
+                try {
+                    // Converte a imagem para Base64
+                    let imagemBase64 = await toBase64(imagemInput);
+                    console.log("Imagem convertida para Base64:", imagemBase64);
+
+                    // Envia para o endpoint de OCR
+                    await fetch("http://localhost:4568/saidaimagem", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ imagem: imagemBase64 })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Resposta recebida da API:", data);
+                            if (data.status === "success") {
+                                placa = data.placa;
+                                console.log("Placa reconhecida:", placa);
+                                registrarSaida(placa); // Chama o método com a placa
+                            } else {
+                                alert("Erro ao reconhecer a placa.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao processar imagem:", error);
+                            alert("Erro ao processar imagem.");
+                        });
+
+                } catch (error) {
+                    console.error("Erro ao converter imagem:", error);
+                    alert("Erro ao converter imagem.");
+                }
+            } else {
+                registrarSaida(placa); // Envia diretamente se não houver imagem
+            }
+        });
+
+        // Função para registrar a saída do veículo
+        function registrarSaida(placa) {
+            fetch("http://localhost:4568/saida", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "placa=" + encodeURIComponent(placa)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert("Veiculo liberado");
+                    } else {
+                        alert("Veiculo não liberado");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao registrar saída:", error);
+                    alert("Erro ao registrar a saída. Verifique a conexão com o servidor.");
+                });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página do Administrador</title>
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/administrador.css">
+</head>
+
+<body>
+    <!-- Menu Superior -->
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="CadastrarVeiculo.html">
+                    <li class="nav-li">Entrada</li>
+                </a>
+                <a href="pagamento.html">
+                    <li class="nav-li">Pagamento</li>
+                </a>
+                <a href="saida.html">
+                    <li class="nav-li">Saída</li>
+                </a>
+                <a href="Cadastrar.html">
+                    <li class="nav-li">Cadastrar</li>
+                </a>
+                <a href="login.html">
+                    <li class="nav-li">Login</li>
+                </a>
+                <a href="index.html">
+                    <li class="nav-li">Início</li>
+                </a>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Barra Lateral -->
+    <div class="sidebar" id="mySidebar">
+        <span class="togglebtn" onclick="toggleSidebar()">&#9776;</span>
+        <span class="closebtn" onclick="toggleSidebar()">&times;</span>
+        <div class="user-info" id="userInfo">
+            <p id="userName"></p>
+            <button class="logout-button" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="main-container">
+            <h1>Bem-vindo à Página do Administrador</h1>
+
+            <div id="div">
+                <h2>Deletar Veículo</h2>
+                <form id="deletar">
+                    <label for="placa">Placa</label>
+                    <input type="text" name="placa" id="placa" required>
+                    <button type="submit">Enviar</button>
+                </form>
+
+                <h2>Listar Veículos</h2>
+                <form id="listar">
+                    <button type="submit">Listar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="lista-veiculos">
+            <p></p>
+        </div>
+    </div>
+
+    <script>
+        // Verifica se o usuário está logado
+        if (localStorage.getItem("loggedIn") !== "true") {
+            alert("Você precisa estar logado para acessar esta página.");
+            window.location.href = "login.html"; // Redireciona para a página de login
+        } else {
+            // Exibe o nome do usuário
+            const username = localStorage.getItem("username");
+            document.getElementById("userName").textContent = `Bem-vindo, ${username}!`;
+        }
+
+        // Função para alternar a barra lateral
+        function toggleSidebar() {
+            const sidebar = document.getElementById("mySidebar");
+            sidebar.classList.toggle("expanded");
+        }
+
+
+        // Função para realizar o logout
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("username");
+            window.location.href = "login.html"; // Redireciona para a página de login após o logout
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/Login.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+ 
+</head>
+
+<body>
+
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="CadastrarVeiculo.html"><li class="nav-li">Entrada</li></a>
+                <a href="pagamento.html"><li class="nav-li">Pagamento</li></a>
+                <a href="saida.html"><li class="nav-li">Saída</li></a>
+                <a href="Cadastrar.html"><li class="nav-li">Cadastrar</li></a>
+                <a href="login.html"><li class="nav-li">Login</li></a>
+                <a href="index.html"><li class="nav-li">Inicio</li></a>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <p>Não tem uma conta? <a href="cadastrar.html">Cadastre-se</a></p>
+    </div>
+
+</body>
+
+<script>
+
+    console.log("script carregado");
+
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let nome = document.getElementById("nome").value;
+    let senha = document.getElementById("senha").value;
+
+    fetch("http://localhost:4568/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "nome=" + encodeURIComponent(nome) + "&senha=" + encodeURIComponent(senha)
+    })
+    .then(response => {
+        console.log("Resposta recebida do servidor:", response);
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            return response.json();  // Processa JSON se o content-type for application/json
+        } else {
+            return response.text();  // Processa texto se for HTML ou outro tipo
+        }
+    })
+    .then(data => {
+        if (typeof data === "string") {
+            // Se for uma string, é uma página HTML de erro
+            console.error("Erro no servidor:", data);
+            alert("Erro no servidor: " + data);
+        } else {
+            // Se for JSON, continua o fluxo normal
+            if (data.status === "success") {
+                localStorage.setItem("username", nome);
+                localStorage.setItem("loggedIn", "true");
+                alert("Login efetuado");
+                window.location.href = "PaginaDoAministrador.html";
+            } else {
+                alert("Login não efetuado");
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Erro ao enviar dados:", error);
+        alert("Erro ao enviar dados. Verifique a conexão com o servidor.");
+    });
+});
+
+
+</script>
+
+</html>

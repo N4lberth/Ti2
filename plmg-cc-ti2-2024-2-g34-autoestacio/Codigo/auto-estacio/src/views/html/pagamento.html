@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Estacio</title>
+    <link rel="stylesheet" href="../css/pagamentoi.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+</head>
+
+<body>
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="CadastrarVeiculo.html">
+                    <li class="nav-li">Entrada</li>
+                </a>
+                <a href="#">
+                    <li class="nav-li">Pagamento</li>
+                </a>
+                <a href="saida.html">
+                    <li class="nav-li">Saída</li>
+                </a>
+                <a href="Cadastrar.html">
+                    <li class="nav-li">Cadastrar</li>
+                </a>
+                <a href="login.html">
+                    <li class="nav-li">Login</li>
+                </a>
+                <a href="index.html">
+                    <li class="nav-li">Inicio</li>
+                </a>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <div class="pgto-section">
+            <div class="form-img"></div>
+
+            <div class="pgto-container">
+                <div class="central">
+                    <div class="title">
+                        <h1>Central de Pagamento</h1>
+                    </div>
+
+                    <div class="input-box margin-bottom">
+                        <label for="placa">Placa do veículo:</label>
+                        <input type="text" name="placa" id="placa" placeholder="Informe a placa" required>
+                    </div>
+
+                    <!-- Botão para calcular o valor -->
+                    <div class="btn margin-bottom">
+                        <button id="calcular-btn">Calcular Valor</button>
+                    </div>
+
+                    <div class="info margin-bottom">
+                        <h4>Valor total: <span id="valor-total"></span></h4>
+                    </div>
+
+                    <!-- Formulário para efetuar o pagamento -->
+                    <form id="pagamento-form" style="display:none;">
+                        <div class="btn">
+                            <button type="submit">Efetuar pagamento</button>
+                        </div>
+                    </form>
+
+                    <div id="resultado" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Função para calcular o valor
+            document.getElementById("calcular-btn").addEventListener("click", function (event) {
+                event.preventDefault();
+                const placa = document.getElementById("placa").value;
+                console.log("Placa capturada:", placa); // Adicione esta linha para verificar o valor
+
+                fetch("http://localhost:4568/calcularvalor", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "placa=" + encodeURIComponent(placa)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const valorTotalSpan = document.getElementById("valor-total");
+                        const resultadoDiv = document.getElementById("resultado");
+                        resultadoDiv.style.display = "block"; // Mostra o resultado
+
+                        if (data.status === "success") {
+                            console.log("Valor calculado:", data.valor); // Adicionando console.log aqui
+                            valorTotalSpan.innerHTML = "R$ " + data.valor;
+                            // Mostra o formulário de pagamento se o valor for calculado com sucesso
+                            document.getElementById("pagamento-form").style.display = "block";
+                        } else {
+                            valorTotalSpan.innerHTML = "Erro: " + data.message;
+                            document.getElementById("pagamento-form").style.display = "none"; // Esconde o formulário se houver erro
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao calcular valor:", error);
+                    });
+            });
+
+            // Função para efetuar o pagamento
+            document.getElementById("pagamento-form").addEventListener("submit", function (event) {
+                event.preventDefault();
+                const placa = document.getElementById("placa").value;
+
+                fetch("http://localhost:4568/pagamento", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "placa=" + encodeURIComponent(placa)
+                })
+                    .then(response => response.text()) // Captura como texto antes de converter
+                    .then(text => {
+                        console.log("Resposta bruta do servidor:", text);
+                        try {
+                            const data = JSON.parse(text); // Tenta converter para JSON
+                            const resultadoDiv = document.getElementById("resultado");
+                            resultadoDiv.style.display = "block";
+
+                            if (data.status === "success") {
+                                resultadoDiv.innerHTML = "Pagamento efetuado com sucesso!";
+                            } else {
+                                resultadoDiv.innerHTML = "Erro ao efetuar pagamento: " + data.message;
+                            }
+                        } catch (error) {
+                            console.error("Erro ao processar resposta:", error);
+                            document.getElementById("resultado").innerHTML = "Erro inesperado ao processar pagamento.";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao efetuar pagamento:", error);
+                    });
+
+            });
+        });
+    </script>
+
+</body>
+
+</html>

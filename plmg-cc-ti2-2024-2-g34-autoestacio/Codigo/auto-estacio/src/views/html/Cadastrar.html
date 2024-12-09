@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="../css/Cadastrar.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+</head>
+
+<body>
+
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="CadastrarVeiculo.html"><li class="nav-li">Entrada</li></a>
+                <a href="pagamento.html"><li class="nav-li">Pagamento</li></a>
+                <a href="saida.html"><li class="nav-li">Saída</li></a>
+                <a href="Cadastrar.html"><li class="nav-li">Cadastrar</li></a>
+                <a href="login.html"><li class="nav-li">Login</li></a>
+                <a href="index.html"><li class="nav-li">Inicio</li></a>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Cadastro</h2>
+        <form id="cadastroForm">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="telefone">Telefone:</label>
+            <input type="telefone" id="telefone" name="telefone" required>
+
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" required>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+        <p>Já tem uma conta? <a href="login.html">Faça login</a></p>
+    </div>
+
+</body>
+
+
+<script>
+    console.log("Script carregado");
+    document.getElementById("cadastroForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let nome = document.getElementById("nome").value;
+        let email = document.getElementById("email").value;
+        let telefone = document.getElementById("telefone").value;
+        let senha = document.getElementById("senha").value;
+
+        fetch("http://localhost:4568/cadastrar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "nome=" + encodeURIComponent(nome) + "&email=" + encodeURIComponent(email) + "&telefone=" + encodeURIComponent(telefone) + "&senha=" + encodeURIComponent(senha)
+        })
+            .then(response => {
+                console.log("Resposta recebida do servidor:", response);
+                return response.text();
+            })
+            .then(data => {
+                console.log("Dados recebidos do servidor:", data);
+                data = JSON.parse(data);  // Converte a string JSON em um objeto
+                if (data.status === "success") {
+                window.alert("cadastro efetuado, voce sera redirecionado para aba de login");
+                window.location.href = "login.html";
+                }else {
+                    window.alert("cadastro nao efetuado");
+
+                }
+            })
+
+            .catch(error => {
+                console.error("Erro ao enviar dados:", error);
+                alert("Erro ao enviar dados. Verifique a conexão com o servidor.");
+            });
+
+
+    });
+
+
+
+
+</script>
+
+</html>

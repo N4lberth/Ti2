@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Estacio</title>
+    <link rel="stylesheet" href="../css/CadastrarVeiculo.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/reset.css">
+</head>
+
+<body>
+    <header id="header">
+        <nav id="navbar" class="header-element">
+            <ul class="nav-ul">
+                <a href="#">
+                    <li class="nav-li">Entrada</li>
+                </a>
+                <a href="pagamento.html">
+                    <li class="nav-li">Pagamento</li>
+                </a>
+                <a href="saida.html">
+                    <li class="nav-li">Saída</li>
+                </a>
+                <a href="Cadastrar.html">
+                    <li class="nav-li">Cadastrar</li>
+                </a>
+                <a href="login.html">
+                    <li class="nav-li">Login</li>
+                </a>
+                <a href="index.html">
+                    <li class="nav-li">Inicio</li>
+                </a>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <div class="form-section">
+            <div class="form-img"></div>
+            <div class="form-container">
+                <form id="FormVeiculo" action="">
+                    <div class="form-header margin-bottom">
+                        <h1>Entrada do veículo</h1>
+                    </div>
+                    <div class="inputs">
+                        <div class="input-box margin-bottom">
+                            <label for="imagem">Imagem da placa:</label>
+                            <input type="file" id="imagem" name="imagem" accept="image/*">
+                        </div>
+                        <div class="input-box margin-bottom">
+                            <label for="placa">Placa do veículo:</label>
+                            <input type="text" name="placa" id="placa" placeholder="Informe a placa">
+                        </div>
+                        <div class="input-box">
+                            <div class="select">
+                                <label for="tipo_veiculo">Tipo de veículo:</label>
+                            </div>
+                            <div class="select-container">
+                                <select name="tipo_veiculo" id="tipo_veiculo">
+                                    <option value="">Selecione</option>
+                                    <option value="Carro">Carro</option>
+                                    <option value="Moto">Moto</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="time" class="margin-bottom">
+                            <div>Horário corrente: 00:00:00</div>
+                        </div>
+                        <div class="btn">
+                            <input type="submit" value="Registrar">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        console.log("Script carregado");
+
+        // Função para atualizar o horário
+        function atualizarHorario() {
+            const agora = new Date();
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            const segundos = String(agora.getSeconds()).padStart(2, '0');
+            document.getElementById('time').innerHTML = `Horário corrente: ${horas}:${minutos}:${segundos}`;
+        }
+        setInterval(atualizarHorario, 1000);
+
+        // Função para converter a imagem para Base64
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(",")[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Envio do formulário
+        document.getElementById("FormVeiculo").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            let placa = document.getElementById("placa").value;
+            let tipo_veiculo = document.getElementById("tipo_veiculo").value;
+            let imagemInput = document.getElementById("imagem").files[0];
+
+            if (imagemInput) {
+                // Converte a imagem para Base64 e envia para a API de OCR
+                try {
+                    let imagemBase64 = await toBase64(imagemInput);
+                    console.log("chamando o endpoint");
+
+                    // Realizando o fetch para processar a imagem
+                    await fetch("http://localhost:4568/processarImagem", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ imagem: imagemBase64 })
+                    })
+                        .then(response => response.json())  // Converter a resposta para JSON
+                        .then(data => {
+                            console.log("Resposta recebida:", data);
+                            if (data.status == "success") {
+                                if (data.ticket == "success" ||data.ticket == "success"  ) {
+                                    alert("veiculo cadastrado com sucesso")
+                                }else {
+                                   alert("erro ao cadastrar veiculo")
+                                }
+                                placa = data.placa;
+                                console.log("Placa reconhecida:", placa);
+                            } else {
+                                console.error("Falha ao reconhecer a placa.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro na resposta da API:", error);
+                            alert("Erro ao processar imagemmm.");
+                        });
+
+                } catch (error) {
+                    console.error("Erro ao converter imagem:", error);
+                    alert("Erro ao converter imagem.");
+                }
+            } else {
+                // Chama o método existente sem imagem
+                registrarVeiculo(placa, tipo_veiculo);
+            }
+        });
+
+
+        function registrarVeiculo(placa, tipo_veiculo) {
+            fetch("http://localhost:4568/cadastrarveiculo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "placa=" + encodeURIComponent(placa) + "&tipo_veiculo=" + encodeURIComponent(tipo_veiculo)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.alert("Veículo cadastrado com sucesso!");
+                    } else {
+                        window.alert("Falha ao cadastrar veículo.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao enviar dados:", error);
+                    alert("Erro ao enviar dados. Verifique a conexão com o servidor.");
+                });
+        }
+    </script>
+
+</body>
+
+</html>
+
+
