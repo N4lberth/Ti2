@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estoque Master - Painel</title>
+    <link rel="stylesheet" href="./css/dashboard_styles.css" />
+    <link rel="stylesheet" href="./css/sidebar_styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Estoque Master</h1>
+      <button id="openSidebar"><img src="./img/ico_config.svg" alt=""></button>
+      <div id="sidebar" class="sidebar">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pages/product_page.html">Produtos</a></li>
+          <li><a href="#">Vendas</a></li>
+          <li><a href="#">Pedidos</a></li>
+          <li><a href="#">Clientes</a></li>
+        </ul>
+        <ul>
+          <li><a href="pages/login_page.html">Login</a></li>
+          <li><a href="pages/signUp_page.html">Cadastro</a></li>
+      </ul>
+      </div>
+    </header>
+    <nav>
+      <ul>
+        
+      </ul>
+    </nav>
+    <main>
+      <div class="left-cards">
+        <div class="dashboard-card">
+          <h2>Resumo do Estoque</h2>
+          <div class="card-content">
+            <p>Total de Produtos: 100</p>
+            <p>Produtos em Estoque: 80</p>
+            <p>Produtos em Falta: 20</p>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <h2>Últimos Pedidos</h2>
+          <div class="card-content">
+            <p>Pedido #001 - Fornecedor: Empresa A - Total: R$ 500,00</p>
+            <p>Pedido #002 - Fornecedor: Empresa B - Total: R$ 300,00</p>
+            <p>Pedido #003 - Fornecedor: Empresa C - Total: R$ 700,00</p>
+          </div>
+        </div>
+      </div>
+      <div class="right-card">
+        <div class="dashboard-card">
+          <h2>Vendas Recentes</h2>
+          <div class="card-content">
+            <p>Venda #001 - Cliente: Empresa A - Total: R$ 500,00</p>
+            <p>Venda #002 - Cliente: Empresa B - Total: R$ 300,00</p>
+            <p>Venda #003 - Cliente: Empresa C - Total: R$ 700,00</p>
+            <p>Venda #004 - Cliente: Empresa D - Total: R$ 500,00</p>
+            <p>Venda #005 - Cliente: Empresa E - Total: R$ 300,00</p>
+            <p>Venda #006 - Cliente: Empresa F - Total: R$ 700,00</p>
+            <p>Venda #007 - Cliente: Empresa G - Total: R$ 500,00</p>
+            <p>Venda #008 - Cliente: Empresa H - Total: R$ 300,00</p>
+            <p>Venda #009 - Cliente: Empresa I - Total: R$ 700,00</p>
+            <p>Venda #009 - Cliente: Empresa J - Total: R$ 700,00</p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer-content">
+      <p>&copy; 2024 Estoque Master. Todos os direitos reservados.</p>
+      <script src="./js/sidebar_script.js"></script>
+    </footer>
+  </body>
+</html>
